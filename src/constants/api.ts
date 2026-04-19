@@ -5,7 +5,7 @@
 
 // 开发环境后端地址（根据实际情况修改）
 export const API_BASE_URL = __DEV__
-  ? 'http://192.168.1.100:8080/api'
+  ? 'http://10.61.200.174:8080/api'
   : 'https://api.pilgrimgo.com/api';
 
 // 请求超时时间（毫秒）
