@@ -1,0 +1,57 @@
+{
+  "expo": {
+    "name": "PilgrimGo",
+    "slug": "PilgrimGo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "scheme": "pilgrimgo",
+    "platforms": ["ios", "android"],
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FF6B6B"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pilgrimgo.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "巡礼+需要获取您的位置以提供导航和路径录制功能",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "巡礼+需要在后台持续获取位置以录制巡礼路径",
+        "NSCameraUsageDescription": "巡礼+需要使用相机以提供AR场景对比和拍照打卡功能",
+        "NSPhotoLibraryUsageDescription": "巡礼+需要访问相册以保存巡礼对比图"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FF6B6B"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.pilgrimgo.app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "CAMERA"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "巡礼+需要在后台持续获取位置以录制巡礼路径"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "巡礼+需要使用相机以提供AR场景对比和拍照打卡功能"
+        }
+      ]
+    ]
+  }
+}
