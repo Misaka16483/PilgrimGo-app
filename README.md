@@ -81,7 +81,7 @@ PilgrimGo（巡礼+）是一款动画巡礼移动端应用，基于以下技术�
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/Misaka16483/PilgrimGo-app.git
+git clone "ssh://username@gerrit.lilingkun.com:29418/Xunli-app"
 cd PilgrimGo-app
 
 # 2. 安装依赖
