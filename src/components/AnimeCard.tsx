@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
+import { getDisplayImageUrl } from '@/utils/image';
 import type { Anime } from '@/types';
 
 interface AnimeCardProps {
@@ -17,7 +18,7 @@ interface AnimeCardProps {
 export function AnimeCard({ anime, onPress }: AnimeCardProps) {
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
-      <Image source={{ uri: anime.coverUrl }} style={styles.cover} />
+      <Image source={{ uri: getDisplayImageUrl(anime.coverUrl) }} style={styles.cover} />
       <View style={styles.info}>
         <Text style={styles.title} numberOfLines={1}>
           {anime.title}
@@ -27,10 +28,11 @@ export function AnimeCard({ anime, onPress }: AnimeCardProps) {
             {anime.titleJp}
           </Text>
         )}
-        <View style={styles.meta}>
-          <Text style={styles.spotCount}>{anime.spotCount} 个取景地</Text>
-          {anime.region && <Text style={styles.region}>{anime.region}</Text>}
-        </View>
+        {anime.region ? (
+          <View style={styles.meta}>
+            <Text style={styles.region}>{anime.region}</Text>
+          </View>
+        ) : null}
       </View>
     </TouchableOpacity>
   );
@@ -71,11 +73,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: Spacing.sm,
     gap: Spacing.md,
-  },
-  spotCount: {
-    fontSize: FontSize.sm,
-    color: Colors.primary,
-    fontWeight: '600',
   },
   region: {
     fontSize: FontSize.sm,

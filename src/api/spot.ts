@@ -1,16 +1,26 @@
 import client from './client';
-import type { Spot, ApiResponse } from '@/types';
+import type { Spot, ApiResponse, MapAnimeOption, MapBounds, MapSpotItem } from '@/types';
 
-/** 获取附近的取景地 */
-export function getNearbySpots(params: {
-  latitude: number;
-  longitude: number;
-  radius?: number;
+export function getMapSpotItems(params: {
+  minLat: number;
+  maxLat: number;
+  minLng: number;
+  maxLng: number;
+  zoom: number;
+  limit?: number;
+  animeId?: number;
 }) {
-  return client.get<any, ApiResponse<Spot[]>>('/spots/nearby', { params });
+  return client.get<any, ApiResponse<MapSpotItem[]>>('/spots/map', { params });
 }
 
-/** 获取取景地详情 */
 export function getSpotDetail(id: number) {
   return client.get<any, ApiResponse<Spot>>(`/spots/${id}`);
+}
+
+export function getMapAnimeOptions(params?: { limit?: number }) {
+  return client.get<any, ApiResponse<MapAnimeOption[]>>('/spots/map/anime', { params });
+}
+
+export function getMapAnimeBounds(animeId: number) {
+  return client.get<any, ApiResponse<MapBounds>>(`/spots/map/anime/${animeId}/bounds`);
 }

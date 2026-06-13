@@ -1,10 +1,13 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import React, { useCallback } from 'react';
+import { Image, Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { getSpotDetail } from '@/api/spot';
 import { Button } from '@/components/Button';
-import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
+import { RemoteImage } from '@/components/RemoteImage';
+import { BorderRadius, Colors, FontSize, Spacing } from '@/constants/theme';
+import type { Spot } from '@/types';
+import { getDisplayImageUrl } from '@/utils/image';
 
 export default function SpotDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -16,60 +19,130 @@ export default function SpotDetailScreen() {
   });
 
   const spot = data?.data;
+  const animeImageUrl = getDisplayImageUrl(spot?.animeImageUrl);
+  const handleOpenMap = useCallback(() => {
+    if (!spot) {
+      return;
+    }
+
+    router.push({
+      pathname: '/spot-map',
+      params: {
+        spotId: String(spot.id),
+      },
+    });
+  }, [router, spot]);
 
   if (!spot) {
     return (
       <View style={styles.center}>
-        <Text>加载中...</Text>
+        <Text style={styles.loadingText}>正在加载取景地详情...</Text>
       </View>
     );
   }
 
+  const episodeText = getEpisodeText(spot);
+  const sceneTimeText = getSceneTimeText(spot);
+  const originText = spot.origin || '暂未标注';
+
   return (
     <ScrollView style={styles.container}>
-      {/* 动画截图 vs 实景对比 */}
       <View style={styles.comparison}>
         <View style={styles.imageWrapper}>
-          <Image source={{ uri: spot.animeImageUrl }} style={styles.image} />
-          <Text style={styles.imageLabel}>动画</Text>
+          <RemoteImage uri={animeImageUrl} style={styles.image} />
+          <Text style={styles.imageLabel}>动画截图</Text>
         </View>
-        {spot.realImageUrl && (
+
+        {spot.realImageUrl ? (
           <View style={styles.imageWrapper}>
             <Image source={{ uri: spot.realImageUrl }} style={styles.image} />
-            <Text style={styles.imageLabel}>实景</Text>
+            <Text style={styles.imageLabel}>实景照片</Text>
           </View>
-        )}
+        ) : null}
       </View>
 
-      {/* 详细信息 */}
       <View style={styles.info}>
         <Text style={styles.name}>{spot.name}</Text>
         <Text style={styles.anime}>{spot.animeTitle}</Text>
-        {spot.episode && (
-          <Text style={styles.episode}>出自：{spot.episode}</Text>
-        )}
-        {spot.description && (
-          <Text style={styles.description}>{spot.description}</Text>
-        )}
 
-        {/* AR 对比按钮 */}
-        <Button
-          title="AR 场景对比"
-          size="lg"
-          onPress={() =>
-            router.push({
-              pathname: '/ar/compare',
-              params: {
-                animeImageUrl: spot.animeImageUrl,
-                spotName: spot.name,
-              },
-            })
-          }
-          style={{ marginTop: Spacing.xxl }}
-        />
+        <View style={styles.metaPanel}>
+          {episodeText ? <DetailRow label="集数" value={episodeText} /> : null}
+          {sceneTimeText ? <DetailRow label="截图时间" value={sceneTimeText} /> : null}
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>来源</Text>
+            {spot.originUrl ? (
+              <Text
+                style={[styles.detailValue, styles.sourceLink]}
+                onPress={() => Linking.openURL(spot.originUrl!)}
+              >
+                {originText}
+              </Text>
+            ) : (
+              <Text style={styles.detailValue}>{originText}</Text>
+            )}
+          </View>
+        </View>
+
+        {spot.description ? <Text style={styles.description}>{spot.description}</Text> : null}
+
+        <View style={styles.actionButtons}>
+          <Button
+            title="地图查看"
+            variant="outline"
+            size="lg"
+            onPress={handleOpenMap}
+            style={styles.actionButton}
+          />
+          <Button
+            title="AR 场景对比 / 打卡"
+            size="lg"
+            onPress={() =>
+              router.push({
+                pathname: '/ar/compare',
+                params: {
+                  spotId: String(spot.id),
+                  animeImageUrl,
+                  spotName: spot.name,
+                },
+              })
+            }
+            style={styles.actionButton}
+          />
+        </View>
       </View>
     </ScrollView>
   );
+}
+
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.detailRow}>
+      <Text style={styles.detailLabel}>{label}</Text>
+      <Text style={styles.detailValue}>{value}</Text>
+    </View>
+  );
+}
+
+function getEpisodeText(spot: Spot) {
+  if (spot.episodeNumber) {
+    return `第 ${spot.episodeNumber} 集`;
+  }
+
+  return spot.episode;
+}
+
+function getSceneTimeText(spot: Spot) {
+  if (spot.sceneTime) {
+    return spot.sceneTime;
+  }
+
+  if (spot.sceneSeconds === undefined) {
+    return undefined;
+  }
+
+  const minutes = Math.floor(spot.sceneSeconds / 60);
+  const seconds = spot.sceneSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
 const styles = StyleSheet.create({
@@ -81,6 +154,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: FontSize.md,
+    color: Colors.textSecondary,
   },
   comparison: {
     flexDirection: 'row',
@@ -121,15 +198,45 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: Spacing.xs,
   },
-  episode: {
+  metaPanel: {
+    marginTop: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: Colors.border,
+    gap: Spacing.sm,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.md,
+  },
+  detailLabel: {
     fontSize: FontSize.sm,
     color: Colors.textSecondary,
-    marginTop: Spacing.xs,
+  },
+  detailValue: {
+    flex: 1,
+    fontSize: FontSize.sm,
+    color: Colors.text,
+    fontWeight: '600',
+    textAlign: 'right',
+  },
+  sourceLink: {
+    color: Colors.primary,
   },
   description: {
     fontSize: FontSize.md,
     color: Colors.textSecondary,
     lineHeight: 22,
     marginTop: Spacing.md,
+  },
+  actionButtons: {
+    marginTop: Spacing.xxl,
+    gap: Spacing.md,
+  },
+  actionButton: {
+    width: '100%',
   },
 });

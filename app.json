@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "PilgrimGo",
+    "name": "巡礼+",
     "slug": "PilgrimGo",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -12,7 +12,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FF6B6B"
+      "backgroundColor": "#FFFFFF"
     },
     "ios": {
       "supportsTablet": true,
@@ -21,21 +21,29 @@
         "NSLocationWhenInUseUsageDescription": "巡礼+需要获取您的位置以提供导航和路径录制功能",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "巡礼+需要在后台持续获取位置以录制巡礼路径",
         "NSCameraUsageDescription": "巡礼+需要使用相机以提供AR场景对比和拍照打卡功能",
-        "NSPhotoLibraryUsageDescription": "巡礼+需要访问相册以保存巡礼对比图"
+        "NSPhotoLibraryUsageDescription": "巡礼+需要访问相册以保存巡礼对比图",
+        "NSPhotoLibraryAddUsageDescription": "巡礼+需要将打卡图片保存到您的相册"
       }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FF6B6B"
+        "backgroundColor": "#FFFFFF"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.pilgrimgo.app",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCCGghgOEG3d9HAF1UXIj5P9PBeQ_gvxls"
+        }
+      },
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "ACCESS_BACKGROUND_LOCATION",
-        "CAMERA"
+        "CAMERA",
+        "READ_MEDIA_IMAGES",
+        "WRITE_EXTERNAL_STORAGE"
       ]
     },
     "plugins": [
@@ -50,6 +58,14 @@
         "expo-camera",
         {
           "cameraPermission": "巡礼+需要使用相机以提供AR场景对比和拍照打卡功能"
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "巡礼+需要访问相册以保存巡礼打卡图片",
+          "savePhotosPermission": "巡礼+需要将打卡图片保存到您的相册",
+          "isAccessMediaLocationEnabled": true
         }
       ]
     ]

@@ -58,6 +58,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="checkin"
+        options={{
+          title: '打卡',
+          headerShown: false,
+          tabBarIcon: ({ focused }) => <TabIcon label="📸" focused={focused} />,
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: '我的',
